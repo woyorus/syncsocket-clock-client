@@ -151,7 +151,6 @@ describe('ClockClient', function () {
             let mockResponseClock = 1469978865700;
             nock(mockServerUrl)
                 .get('/')
-                .socketDelay(100)
                 .reply(function (uri, requestBody, cb) {
                     let clientStamp = this.req.headers['x-client-timestamp'];
                     cb(null, [200, clientStamp + ',' + mockResponseClock]);
