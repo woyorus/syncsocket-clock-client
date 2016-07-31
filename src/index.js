@@ -32,7 +32,10 @@ ClockClient.prototype.sync = function () {
         let localSentStamp = Date.now();
         this.sendClock(localSentStamp, (err, remoteResponseStamp) => {
             let localRecvStamp = Date.now();
-            if (err) { reject(err); }
+            if (err) {
+                reject(err);
+                return;
+            }
 
             let halfRound = this.calcHalfRoundTrip(localSentStamp, localRecvStamp);
             let readingResult = {
