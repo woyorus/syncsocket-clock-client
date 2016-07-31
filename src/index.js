@@ -21,8 +21,6 @@ function ClockClient(url, opts) {
     }
 
     this.timeoutDelay = this.calcTimeoutDelay(upperBound);
-
-    console.log(`timeoutDelay=${this.timeoutDelay}, minUB=${minUpperBound}. Adjust settings to make these as close as possible`);
 }
 
 function throwInvalidSetting() {
