@@ -34,24 +34,15 @@ ClockClient.prototype.sync = function () {
         let localSentStamp = Date.now();
         this.sendClock(localSentStamp, (err, remoteResponseStamp) => {
             let localRecvStamp = Date.now();
-
-            if (err) {
-                throw err;
-            }
+            if (err) { reject(err); }
 
             let halfRound = this.calcHalfRoundTrip(localSentStamp, localRecvStamp);
-
             let readingResult = {
                 error: this.calculateReadError(halfRound),
                 adjust: this.calculateAdjust(halfRound, remoteResponseStamp, localRecvStamp),
                 successful: this.isReadingSuccessful(halfRound)
             };
-
-            if (readingResult.successful === true) {
-                resolve(readingResult);
-            } else {
-                reject(readingResult);
-            }
+            resolve(readingResult);
         });
     });
 };
