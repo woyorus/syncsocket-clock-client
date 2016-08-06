@@ -10,8 +10,8 @@ function ClockClient(url, opts) {
     this.serverHost = parsedUrl.hostname;
     this.serverPort = parseInt(parsedUrl.port) || 5579;
     this.targetPrecision = opts.targetPrecision || 50;
-    this.minReadingDelay = opts.minReadingDelay || 1;
-    this.clockDrift = opts.clockDrift || 0;
+    this.minReadingDelay = opts.minReadingDelay || 0.2;
+    this.clockDrift = opts.clockDrift || 0.0001;
 
     let upperBound = this.calcUpperBound();
     let minUpperBound = this.calcMinUpperBound();
