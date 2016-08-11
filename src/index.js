@@ -28,10 +28,10 @@ function throwInvalidSetting() {
 }
 
 ClockClient.prototype.sync = function () {
+    var that = this;
     return new Promise(function (resolve, reject) {
         var localSentStamp = Date.now();
-        var that = this;
-        this.sendClock(localSentStamp, function (err, remoteResponseStamp) {
+        that.sendClock(localSentStamp, function (err, remoteResponseStamp) {
             var localRecvStamp = Date.now();
             if (err) {
                 reject(err);
