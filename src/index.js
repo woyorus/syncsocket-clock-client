@@ -6,15 +6,15 @@ module.exports = ClockClient;
 function ClockClient(url, opts) {
     if (!(this instanceof ClockClient)) return new ClockClient(url, opts);
     opts = opts || {};
-    let parsedUrl = URL.parse(url);
+    var parsedUrl = URL.parse(url);
     this.serverHost = parsedUrl.hostname;
     this.serverPort = parseInt(parsedUrl.port) || 5579;
     this.targetPrecision = opts.targetPrecision || 50;
     this.minReadingDelay = opts.minReadingDelay || 0.2;
     this.clockDrift = opts.clockDrift || 0.0001;
 
-    let upperBound = this.calcUpperBound();
-    let minUpperBound = this.calcMinUpperBound();
+    var upperBound = this.calcUpperBound();
+    var minUpperBound = this.calcMinUpperBound();
 
     if (!(this.verifyUpperBound(upperBound, minUpperBound))) {
         throwInvalidSetting();
@@ -28,20 +28,21 @@ function throwInvalidSetting() {
 }
 
 ClockClient.prototype.sync = function () {
-    return new Promise((resolve, reject) => {
-        let localSentStamp = Date.now();
-        this.sendClock(localSentStamp, (err, remoteResponseStamp) => {
-            let localRecvStamp = Date.now();
+    return new Promise(function (resolve, reject) {
+        var localSentStamp = Date.now();
+        var that = this;
+        this.sendClock(localSentStamp, function (err, remoteResponseStamp) {
+            var localRecvStamp = Date.now();
             if (err) {
                 reject(err);
                 return;
             }
 
-            let halfRound = this.calcHalfRoundTrip(localSentStamp, localRecvStamp);
-            let readingResult = {
-                error: this.calculateReadError(halfRound),
-                adjust: this.calculateAdjust(halfRound, remoteResponseStamp, localRecvStamp),
-                successful: this.isReadingSuccessful(halfRound)
+            var halfRound = that.calcHalfRoundTrip(localSentStamp, localRecvStamp);
+            var readingResult = {
+                error: that.calculateReadError(halfRound),
+                adjust: that.calculateAdjust(halfRound, remoteResponseStamp, localRecvStamp),
+                successful: that.isReadingSuccessful(halfRound)
             };
             resolve(readingResult);
         });
@@ -49,25 +50,25 @@ ClockClient.prototype.sync = function () {
 };
 
 ClockClient.prototype.sendClock = function (clock, cb) {
-    let localStampSent = clock;
-    let request = http.get({
+    var localStampSent = clock;
+    var request = http.get({
         host: this.serverHost,
         port: this.serverPort,
         path: '/',
         method: 'GET',
         headers: { 'X-Client-Timestamp': '' + localStampSent },
         withCredentials: false
-    }, (res) => {
+    }, function (res) {
         if (res.statusCode !== 200) {
             cb(new Error('Server response isn\'t 200! (it is ' + res.statusCode + ')'));
             return;
         }
         var body = '';
-        res.on('data', (d) => body += d);
-        res.on('end', () => {
-            let parts = body.split(',');
-            let responseStampCheck = parts[0];
-            let responseStampRemote = parts[1];
+        res.on('data', function (d) { body += d });
+        res.on('end', function () {
+            var parts = body.split(',');
+            var responseStampCheck = parts[0];
+            var responseStampRemote = parts[1];
             if (localStampSent !== parseInt(responseStampCheck)) {
                 cb(new Error('Timestamp verification failed!'));
             }
@@ -110,8 +111,8 @@ ClockClient.prototype.calculateAdjust = function (halfRound, remoteTimestamp, lo
 };
 
 ClockClient.prototype.calculateReadError = function (halfRound) {
-    let e = halfRound * (1 + (2 * this.clockDrift)) - this.minReadingDelay;
-    let eMin = 3 * this.clockDrift * this.minReadingDelay;
+    var e = halfRound * (1 + (2 * this.clockDrift)) - this.minReadingDelay;
+    var eMin = 3 * this.clockDrift * this.minReadingDelay;
     if (e < eMin) throw new Error('Assertion failed: e < eMin');
     return e;
 };
