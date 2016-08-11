@@ -55,7 +55,8 @@ ClockClient.prototype.sendClock = function (clock, cb) {
         port: this.serverPort,
         path: '/',
         method: 'GET',
-        headers: { 'X-Client-Timestamp': '' + localStampSent }
+        headers: { 'X-Client-Timestamp': '' + localStampSent },
+        withCredentials: false
     }, (res) => {
         if (res.statusCode !== 200) {
             cb(new Error('Server response isn\'t 200! (it is ' + res.statusCode + ')'));
@@ -78,7 +79,6 @@ ClockClient.prototype.sendClock = function (clock, cb) {
     request.on('error', function (err) {
         cb(err);
     });
-    request.end();
 };
 
 ClockClient.prototype.calcHalfRoundTrip = function (stampSent, stampReceived) {
