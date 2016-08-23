@@ -4,7 +4,6 @@ const http = require('http');
 module.exports = ClockClient;
 
 function ClockClient(url, opts) {
-    if (!(this instanceof ClockClient)) return new ClockClient(url, opts);
     opts = opts || {};
     var parsedUrl = URL.parse(url);
     this.serverHost = parsedUrl.hostname;
